@@ -9,12 +9,14 @@ scanner discovers them automatically.
 from web_vul_scanner.checks.base import Check, CheckContext, all_checks, register
 from web_vul_scanner.checks.reachability import ReachabilityCheck
 from web_vul_scanner.checks.sql_injection import SqlInjectionCheck
+from web_vul_scanner.checks.xss_injection import XssInjectionCheck
 
 __all__ = [
     "Check",
     "CheckContext",
     "ReachabilityCheck",
     "SqlInjectionCheck",
+    "XssInjectionCheck",
     "all_checks",
     "register",
 ]
