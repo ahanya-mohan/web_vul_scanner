@@ -28,7 +28,16 @@ def test_safe_search_is_not_flagged(target_url: str) -> None:
     assert [f for f in result.findings if f.check_id == "sql_injection"] == []
 
 
-def test_no_params_means_no_sqli_finding(target_url: str) -> None:
-    result = _scan(target_url)
+def test_endpoint_without_inputs_has_no_sqli_finding(target_url: str) -> None:
+    result = _scan(f"{target_url}/healthz")
 
     assert [f for f in result.findings if f.check_id == "sql_injection"] == []
+
+
+def test_login_form_is_discovered_and_flagged(target_url: str) -> None:
+    # From the base URL the crawler finds the POST login form and the check
+    # detects the injectable username/password fields.
+    result = _scan(target_url)
+
+    sqli = [f for f in result.findings if f.check_id == "sql_injection"]
+    assert any("username" in f.name for f in sqli)

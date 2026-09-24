@@ -18,7 +18,7 @@ from collections.abc import Iterable
 import requests
 
 from web_vul_scanner.checks.base import Check, CheckContext, register
-from web_vul_scanner.core.injection import InjectionPoint, query_injection_points
+from web_vul_scanner.core.injection import InjectionPoint
 from web_vul_scanner.report.models import Finding, Severity
 
 _REMEDIATION = (
@@ -62,14 +62,10 @@ class SqlInjectionCheck(Check):
     name = "SQL injection"
 
     def run(self, context: CheckContext) -> Iterable[Finding]:
-        for point in self._points(context):
+        for point in context.injection_points:
             finding = self._test_point(context, point)
             if finding is not None:
                 yield finding
-
-    def _points(self, context: CheckContext) -> list[InjectionPoint]:
-        # Slice 3 replaces this with points discovered by the crawler.
-        return query_injection_points(context.target)
 
     def _test_point(self, context: CheckContext, point: InjectionPoint) -> Finding | None:
         try:

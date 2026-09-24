@@ -9,18 +9,24 @@ from __future__ import annotations
 
 import abc
 from collections.abc import Iterable, Iterator
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from web_vul_scanner.core.http_client import HttpClient
+from web_vul_scanner.core.injection import InjectionPoint
 from web_vul_scanner.report.models import Finding
 
 
 @dataclass(slots=True)
 class CheckContext:
-    """Everything a check needs to inspect a target."""
+    """Everything a check needs to inspect a target.
+
+    ``injection_points`` are the parameters discovered by the crawler; checks
+    that probe inputs iterate over them.
+    """
 
     target: str
     http: HttpClient
+    injection_points: list[InjectionPoint] = field(default_factory=list)
 
 
 class Check(abc.ABC):

@@ -22,7 +22,16 @@ for web_vul_scanner. Do not deploy it.</p>
 <ul>
   <li><a href="/search?q=phone">Product search</a></li>
   <li><a href="/greet?name=friend">Greeting</a></li>
+  <li><a href="/login">Login</a></li>
 </ul>
+"""
+
+_LOGIN_FORM = """<!doctype html><title>Login</title>
+<form method="post" action="/login">
+  <input name="username" value="">
+  <input name="password" type="password" value="">
+  <button type="submit">Log in</button>
+</form>
 """
 
 
@@ -74,6 +83,26 @@ def create_app() -> Flask:
         name = request.args.get("name", "friend")
         # SAFE: the value is HTML-escaped before being written into the page.
         return f"<!doctype html><title>Greeting</title><p>Hello {escape(name)}</p>"
+
+    # -- SQL injection via a POST form -----------------------------------------
+
+    @app.get("/login")
+    def login_form() -> str:
+        return _LOGIN_FORM
+
+    @app.post("/login")
+    def login() -> tuple[str, int] | str:
+        username = request.form.get("username", "")
+        password = request.form.get("password", "")
+        # VULNERABLE: credentials concatenated into the SQL string.
+        sql = f"SELECT id FROM users WHERE username = '{username}' AND password = '{password}'"
+        try:
+            rows = db.execute(sql)
+        except sqlite3.Error as exc:
+            return f"Database error: {exc}", 500
+        if rows:
+            return "<p>Welcome back!</p>"
+        return "<p>Invalid credentials</p>", 401
 
     return app
 
