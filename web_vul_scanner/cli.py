@@ -14,8 +14,12 @@ from __future__ import annotations
 import argparse
 import sys
 from collections.abc import Sequence
+from pathlib import Path
 
 from web_vul_scanner import __version__
+from web_vul_scanner.classifier.dataset import DEFAULT_MODEL
+from web_vul_scanner.classifier.features import feature_vector
+from web_vul_scanner.classifier.model import GaussianNaiveBayes
 from web_vul_scanner.core.authorization import Authorization, UnauthorizedTargetError
 from web_vul_scanner.report.models import Severity
 from web_vul_scanner.report.render import render_text
@@ -46,6 +50,18 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="exit non-zero if a finding of this severity or higher is present",
     )
+
+    classify = sub.add_parser(
+        "classify",
+        help="predict whether a URL looks like phishing (offline; sends no requests)",
+    )
+    classify.add_argument("url", help="the URL to classify")
+    classify.add_argument(
+        "--model",
+        type=Path,
+        default=DEFAULT_MODEL,
+        help="path to a trained model.json (default: the bundled model)",
+    )
     return parser
 
 
@@ -70,10 +86,31 @@ def _run_scan(args: argparse.Namespace) -> int:
     return 0
 
 
+def _run_classify(args: argparse.Namespace) -> int:
+    if not args.model.exists():
+        print(
+            f"error: no model at {args.model}. Train one with "
+            f"`python -m web_vul_scanner.classifier.train`.",
+            file=sys.stderr,
+        )
+        return 2
+
+    model = GaussianNaiveBayes.load(args.model)
+    probabilities = model.predict_proba(feature_vector(args.url))
+    phishing_prob = probabilities.get(1, 0.0)
+    verdict = "PHISHING" if model.predict(feature_vector(args.url)) == 1 else "legitimate"
+
+    print(f"{verdict}  (phishing probability {phishing_prob:.1%})")
+    print(f"  {args.url}")
+    return 0
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.command == "scan":
         return _run_scan(args)
+    if args.command == "classify":
+        return _run_classify(args)
     return 0  # pragma: no cover - argparse enforces a valid command
 
 
