@@ -8,5 +8,13 @@ scanner discovers them automatically.
 
 from web_vul_scanner.checks.base import Check, CheckContext, all_checks, register
 from web_vul_scanner.checks.reachability import ReachabilityCheck
+from web_vul_scanner.checks.sql_injection import SqlInjectionCheck
 
-__all__ = ["Check", "CheckContext", "ReachabilityCheck", "all_checks", "register"]
+__all__ = [
+    "Check",
+    "CheckContext",
+    "ReachabilityCheck",
+    "SqlInjectionCheck",
+    "all_checks",
+    "register",
+]
