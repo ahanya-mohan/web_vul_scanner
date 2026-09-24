@@ -1,0 +1,55 @@
+{% extends "scans/base.html" %}
+
+{% block content %}
+<div class="card">
+  <form method="post" action="{% url 'scan' %}">
+    {% csrf_token %}
+    <label for="{{ form.url.id_for_label }}">Target URL</label>
+    {{ form.url }}
+    {% if form.url.errors %}<p class="notice">{{ form.url.errors.0 }}</p>{% endif %}
+    <p class="help">Loopback targets are allowed automatically. Only scan systems you are authorized to test.</p>
+
+    <label for="{{ form.allow_hosts.id_for_label }}">Authorized hosts</label>
+    {{ form.allow_hosts }}
+    <p class="help">{{ form.allow_hosts.help_text }}</p>
+
+    <button type="submit">Run scan</button>
+  </form>
+</div>
+
+{% if error %}
+  <div class="card"><p class="notice">{{ error }}</p></div>
+{% endif %}
+
+{% if result %}
+  <div class="card">
+    <h2>Results for <code>{{ result.target }}</code></h2>
+    <p class="warn">
+      {{ result.findings|length }} finding(s) &middot; highest severity:
+      <span class="badge sev-{{ result.highest_severity.label|lower }}">{{ result.highest_severity.label }}</span>
+    </p>
+    {% if result.findings %}
+      <table>
+        <thead><tr><th>Severity</th><th>Finding</th><th>Where / evidence</th></tr></thead>
+        <tbody>
+          {% for f in result.findings %}
+            <tr>
+              <td><span class="badge sev-{{ f.severity.label|lower }}">{{ f.severity.label }}</span></td>
+              <td>
+                <strong>{{ f.name }}</strong>
+                {% if f.remediation %}<div class="warn">Fix: {{ f.remediation }}</div>{% endif %}
+              </td>
+              <td>
+                <code>{{ f.url }}</code>
+                {% if f.evidence %}<div class="warn">{{ f.evidence }}</div>{% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No findings.</p>
+    {% endif %}
+  </div>
+{% endif %}
+{% endblock %}

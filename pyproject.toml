@@ -17,7 +17,9 @@ dependencies = [
 # The bundled target and the test/dev toolchain.
 dev = [
     "flask>=3.0",
+    "django>=5.0",
     "pytest>=8.0",
+    "pytest-django>=4.8",
     "ruff>=0.5",
 ]
 
@@ -29,6 +31,8 @@ include = ["web_vul_scanner*", "targets*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = [".", "webui"]
+DJANGO_SETTINGS_MODULE = "config.settings"
 
 [tool.ruff]
 target-version = "py310"

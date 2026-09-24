@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}web_vul_scanner{% endblock %}</title>
+  <style>
+    :root { --bg:#0f172a; --panel:#1e293b; --ink:#e2e8f0; --muted:#94a3b8; --accent:#38bdf8; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, sans-serif; background:var(--bg); color:var(--ink); }
+    header { padding:1.5rem 1rem; border-bottom:1px solid #334155; }
+    header h1 { margin:0; font-size:1.3rem; } header h1 span { color:var(--accent); }
+    main { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+    .card { background:var(--panel); border:1px solid #334155; border-radius:10px; padding:1.25rem; margin-bottom:1.25rem; }
+    label { display:block; font-weight:600; margin-bottom:.25rem; }
+    input[type=url], input[type=text] { width:100%; padding:.6rem .7rem; border-radius:7px; border:1px solid #475569; background:#0b1220; color:var(--ink); }
+    .help { color:var(--muted); font-size:.85rem; margin:.25rem 0 1rem; }
+    button { background:var(--accent); color:#04263a; border:0; border-radius:7px; padding:.6rem 1.1rem; font-weight:700; cursor:pointer; }
+    .notice { background:#7f1d1d; border:1px solid #b91c1c; padding:.75rem 1rem; border-radius:8px; }
+    .warn { color:var(--muted); font-size:.85rem; }
+    table { width:100%; border-collapse:collapse; }
+    th, td { text-align:left; padding:.55rem .6rem; border-bottom:1px solid #334155; vertical-align:top; }
+    th { color:var(--muted); font-weight:600; font-size:.8rem; text-transform:uppercase; letter-spacing:.03em; }
+    .badge { display:inline-block; padding:.1rem .5rem; border-radius:999px; font-size:.75rem; font-weight:700; }
+    .sev-critical { background:#7f1d1d; color:#fecaca; }
+    .sev-high { background:#9a3412; color:#fed7aa; }
+    .sev-medium { background:#854d0e; color:#fde68a; }
+    .sev-low { background:#155e75; color:#a5f3fc; }
+    .sev-info { background:#334155; color:#cbd5e1; }
+    code { background:#0b1220; padding:.05rem .3rem; border-radius:4px; }
+  </style>
+</head>
+<body>
+  <header><h1>web<span>_</span>vul<span>_</span>scanner</h1></header>
+  <main>{% block content %}{% endblock %}</main>
+</body>
+</html>
