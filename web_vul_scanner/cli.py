@@ -22,7 +22,7 @@ from web_vul_scanner.classifier.features import feature_vector
 from web_vul_scanner.classifier.model import GaussianNaiveBayes
 from web_vul_scanner.core.authorization import Authorization, UnauthorizedTargetError
 from web_vul_scanner.report.models import Severity
-from web_vul_scanner.report.render import render_text
+from web_vul_scanner.report.render import render_html, render_text
 from web_vul_scanner.scanner import Scanner
 
 
@@ -43,7 +43,19 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="HOST",
         help="authorize a non-loopback host (repeatable); loopback is allowed by default.",
     )
-    scan.add_argument("--json", action="store_true", help="print the report as JSON")
+    scan.add_argument(
+        "--format",
+        choices=["text", "json", "html"],
+        default="text",
+        help="report format (default: text)",
+    )
+    scan.add_argument("--json", action="store_true", help="shortcut for --format json")
+    scan.add_argument(
+        "--output",
+        type=Path,
+        metavar="PATH",
+        help="write the report to a file instead of stdout",
+    )
     scan.add_argument(
         "--fail-on",
         choices=[s.name.lower() for s in Severity],
@@ -77,7 +89,16 @@ def _run_scan(args: argparse.Namespace) -> int:
         print(f"error: {exc}", file=sys.stderr)
         return 2
 
-    print(result.to_json() if args.json else render_text(result), end="" if args.json else "\n")
+    fmt = "json" if args.json else args.format
+    report = {"json": result.to_json, "html": lambda: render_html(result)}.get(
+        fmt, lambda: render_text(result)
+    )()
+
+    if args.output is not None:
+        args.output.write_text(report, encoding="utf-8")
+        print(f"Wrote {fmt} report to {args.output}")
+    else:
+        print(report, end="\n" if fmt == "text" else "")
 
     if args.fail_on is not None:
         threshold = Severity[args.fail_on.upper()]
