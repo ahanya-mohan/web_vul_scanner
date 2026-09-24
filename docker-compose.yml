@@ -1,0 +1,9 @@
+# Runs the bundled vulnerable target for local scanning. Bound to loopback
+# only: the target is intentionally insecure and must not be exposed.
+services:
+  target:
+    build:
+      context: .
+      dockerfile: docker/target.Dockerfile
+    ports:
+      - "127.0.0.1:5000:5000"
