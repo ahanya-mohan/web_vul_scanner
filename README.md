@@ -33,7 +33,8 @@ classifier**. CLI, Django UI, and HTML/JSON reports.
 6. [Testing and CI](#testing-and-ci)
 7. [Getting started](#getting-started)
 8. [Project structure](#project-structure)
-9. [License](#license)
+9. [Background](#background)
+10. [License](#license)
 
 ## What it does
 
@@ -259,6 +260,22 @@ web_vul_scanner/
 ├── docker/ · docker-compose.yml
 └── .github/workflows/ci.yml    ruff + pytest (3.10, 3.12) + classifier
 ```
+
+## Background
+
+web_vul_scanner began as a BCA academic project, originally written with
+Python 2.7 and Django. This repository is a clean re-implementation on a current
+Python 3 and Django toolchain. It keeps the original design — a URL is crawled,
+its inputs are probed for SQL injection and JavaScript/XSS injection, and a Naive
+Bayes classifier flags phishing-style URLs — and adds:
+
+- both SQL injection and reflected XSS detection, each with severity and remediation advice
+- automatic crawling of links and forms to discover the inputs to test
+- the Naive Bayes phishing-URL classifier rebuilt from scratch, with an accuracy / precision / recall evaluation harness
+- text, JSON and standalone HTML reports, plus a Django UI
+- a pluggable check architecture, automated tests and CI
+
+**Planned:** more checks (security headers, CSRF) and scanning of authenticated areas.
 
 ## License
 
